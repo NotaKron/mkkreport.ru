@@ -46,16 +46,15 @@
     echo "<br> first: $first <br>";
     echo "second: $second <br>";
     require_once './Modules/MsSQL.php';
-    $con = new MsSQL('Password=12Fltzkja;Persist Security Info=True;User ID=sa;Initial Catalog=gkArcade;Data Source=172.16.42.18;');
-    $dataArray = $con->getResult("set DATEFORMAT dmy
+    $sqlQuery="set DATEFORMAT dmy
 
 declare @Date1 DateTime ='$first'
 declare @Date2 DateTime = '$second'
 Select 
-    DateAdd(day,DateDiff(day,0,T.[DATE]),0) as Дата,
-	X.CTG1_N as Категория,
-	sum(case when T.ACTIVITY=1 and T.QUANT > 0 then 1 else T.QUANT end) as [Количество игр],
-    sum(case when T.ACCOUNT_TYPE not in (2, 33) then -T.VALUE else 0 end) as [Количество очков],
+    DateAdd(day,DateDiff(day,0,T.[DATE]),0) as [Дата],
+	X.CTG1_N as [Категория],
+	sum(case when T.ACTIVITY=1 and T.QUANT > 0 then 1 else T.QUANT end) as \"Количество игр\",
+    sum(case when T.ACCOUNT_TYPE not in (2, 33) then -T.VALUE else 0 end) as \"Количество очков\",
     sum(case when T.ACCOUNT_TYPE=2 then T.VALUE else 0 end) as COUPONS,
    sum(case when T.ACCOUNT_TYPE=33 then T.VALUE else 0 end) as TicketsDispense
 FROM 
@@ -68,7 +67,9 @@ WHERE
 
 Group by DateAdd(day,DateDiff(day,0,T.[DATE]),0),
 X.CTG1_N
-ORDER BY  DateAdd(day,DateDiff(day,0,T.[DATE]),0)");
+ORDER BY  DateAdd(day,DateDiff(day,0,T.[DATE]),0)";
+    $con = new MsSQL('Password=12Fltzkja;Persist Security Info=True;User ID=sa;Initial Catalog=gkArcade;Data Source=172.16.42.18;');
+    $dataArray = $con->getResult($sqlQuery);
     /*       foreach ($dataArray as $key =>$value){
            echo $key.":    ";
            print_r($value);
@@ -110,8 +111,11 @@ ORDER BY  DateAdd(day,DateDiff(day,0,T.[DATE]),0)");
    */
   echo"<br>___________________________________________________________<br>_______________________________________________________<br>";
     require_once 'table.php';
-    $table=new table($dataArray);
-    $table->printTable();
+    require_once  'Modules/textModules.php';
+    $union = new textModules();
+    $union->getUnionFieldsFromMsSQL($sqlQuery)
+  //  $table=new table($dataArray);
+   // $table->printTable();
     ?>
 <!--</table>!-->
 </body>
