@@ -9,7 +9,7 @@
 class textModules
 {
 public function getUnionFieldsFromMsSQL($guery){
-if(preg_match('#as [(.*)]#sei',$guery,$union));
-    print_r($union);
+if(preg_match_all('/\"(.*?)\"/sei',$guery,$union));
+    print_r($union[1]);
 }
 }
